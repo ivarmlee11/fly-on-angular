@@ -30,14 +30,16 @@ angular.module('AirplaneApp', ['ui.router', 'ngResource'])
 .factory('Airplanes', ['$resource', function($resource) {
   url = 'http://localhost:3000/api/airplanes/:id';
   return $resource(url, {}, {
-    all: { isArray: false },
-    get: { isArray: false }
+    get: {method: 'GET', isArray: true},
+    all: {method: 'GET', isArray: true},
+    delete: {method: 'DELETE'}
   });
 }])
 
 .controller('AirplaneCtrl', ['$scope', '$stateParams', 'Airplanes',
  function($scope, $stateParams, Airplanes) {
 
+  // $scope.airplanes = [];
   $scope.airplane = {
     name: '',
     model: '',

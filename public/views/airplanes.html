@@ -1,9 +1,10 @@
 <h1>Airplanes!</h1>
 
+
 <div ng-repeat="airplane in airplanes track by airplane._id">
 <p>{{airplane.name}}</p>
 <p>{{airplane.model}}</p>
 <p>{{airplane.engines}}</p>
-<p><a href="/#/api/airplanes/" + "{{airplane._id}}">This Plane</a></p>
+<p><a href="/#/api/airplanes/{{airplane._id}}">This Plane</a></p>
 <button ng-click="delete(airplane._id, $index)">Delete</button>
 </div>
