@@ -8,6 +8,16 @@ angular.module('AirplaneApp', ['ui.router', 'ngResource'])
     templateUrl: 'views/airplanes.html',
     controller: 'AirplaneCtrl'
   })
+  .state('new', {
+    url: '/airplanes/new',
+    templateUrl: 'views/new.html',
+    controller: 'AirplaneCtrl'
+  })
+  .state('show', {
+    url: '/airplanes/:id',
+    templateUrl: 'views/showone.html',
+    controller: 'AirplaneCtrl'
+  })
   .state('404', {
     url: '/404',
     templateUrl: 'views/404.html'
@@ -18,21 +28,71 @@ angular.module('AirplaneApp', ['ui.router', 'ngResource'])
 }])
 
 .factory('Airplanes', ['$resource', function($resource) {
-  return $resource('http://localhost:3000/api/airplanes/:id', {}, {
-    query: { isArray: true }
+  url = 'http://localhost:3000/api/airplanes/:id';
+  return $resource(url, {}, {
+    all: { isArray: false },
+    get: { isArray: false }
   });
 }])
 
-.controller('AirplaneCtrl', ['$scope', 'Airplanes', function($scope, Airplanes) {
+.controller('AirplaneCtrl', ['$scope', '$stateParams', 'Airplanes',
+ function($scope, $stateParams, Airplanes) {
+
   $scope.airplane = {
     name: '',
     model: '',
     engines: null
   };
-  Airplanes.query(function success(data) {
+
+  Airplanes.all(function success(data) {
     $scope.airplanes = data;
   }, function error(data) {
     console.log(data);
   });
+
+  Airplanes.get({id: $stateParams.id},
+   function success(data) {
+    $scope.airplane = data;
+  }, function error(data) {
+    console.log(data);
+  });
+
+  $scope.delete = function(id, idx) {
+    Airplanes.delete('/api/airplanes/' + id)
+    .then(function success(res) {
+      $scope.airplanes.splice(idx, 1);
+    }, function error(res) {
+      alert('fail');
+    });
+  };
+
+  $scope.add = function() {
+    Airplanes.post('/api/airplanes/', $scope.airplane).then(function success(res) {
+      $scope.airplanes.push(res.data);
+      $scope.airplane.name = '';
+      $scope.airplane.model = '';
+      $scope.airplane.engines = null;
+    }, function error(res) {
+      console.log(res);
+      $scope.airplane.name = '';
+      $scope.airplane.model = '';
+      $scope.airplane.engines = null;
+    });
+  }
+
+  $scope.edit = function() {
+    Airplanes.put('/api/airplanes/', $scope.airplane)
+    .then(function success(res) {
+      $scope.airplanes.push(res.data);
+      $scope.airplane.name = '';
+      $scope.airplane.model = '';
+      $scope.airplane.engines = null;
+    }, function error(res) {
+      console.log(res);
+      $scope.airplane.name = '';
+      $scope.airplane.model = '';
+      $scope.airplane.engines = null;
+    });
+  }
 }]);
 
